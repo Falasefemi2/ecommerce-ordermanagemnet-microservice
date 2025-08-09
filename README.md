@@ -70,7 +70,7 @@ The system is composed of the following core microservices:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/E-CommerceOrderManagementMicroservices.git
+    git clone https://github.com/Falasefemi2/ecommerce-ordermanagemnet-microservice.git
     cd E-CommerceOrderManagementMicroservices
     ```
 
