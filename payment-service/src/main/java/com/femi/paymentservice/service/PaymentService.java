@@ -21,7 +21,7 @@ public class PaymentService {
         Payment payment = Payment.builder()
                 .orderId(orderId)
                 .amount(amount)
-                .status(success ? "Success" : "Failed")
+                .status(success ? "SUCCESS" : "FAILED")
                 .paymentDate(LocalDateTime.now())
                 .build();
 

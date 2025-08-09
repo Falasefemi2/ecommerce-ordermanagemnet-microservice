@@ -7,12 +7,14 @@ import com.femi.orderservice.client.ProductResponse;
 import com.femi.orderservice.model.Order;
 import com.femi.orderservice.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -37,13 +39,28 @@ public class OrderService {
                 .build();
 
         order = orderRepository.save(order);
+        log.info("Order saved with ID: {}", order.getId());
 
-        PaymentResponse payment = paymentClient.makePayment(order.getId(), order.getTotalPrice());
+        try {
+            log.info("Calling payment service for order: {} with amount: {}",
+                    order.getId(), order.getTotalPrice());
 
-        if (!"SUCCESS".equals(payment.getStatus())) {
-            throw new RuntimeException("Payment failed for order: " + order.getId());
+            PaymentResponse payment = paymentClient.makePayment(order.getId(), order.getTotalPrice());
+
+            log.info("Payment response received: {}", payment);
+            log.info("Payment status: {}", payment.getStatus());
+
+            if (!"SUCCESS".equals(payment.getStatus())) {
+                log.error("Payment failed. Expected 'SUCCESS', but got: '{}'", payment.getStatus());
+                throw new RuntimeException("Payment failed for order: " + order.getId());
+            }
+
+            log.info("Payment successful for order: {}", order.getId());
+            return order;
+
+        } catch (Exception e) {
+            log.error("Error during payment processing: ", e);
+            throw e;
         }
-
-        return order;
     }
 }
